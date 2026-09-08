@@ -17,13 +17,13 @@ var points = [
 
     vec4(-0.75, 0, 0, 1), // 9 door
     vec4(0.75, 0, 0, 1),
-    vec4(0.75, 1.1, 0, 1),
-    vec4(-0.75, 1.1, 0, 1),
+    vec4(0.75, 1.45, 0, 1),
+    vec4(-0.75, 1.45, 0, 1),
 
-    vec4(0, 3.25, 0, 1), // 13 diamond
-    vec4(-0.75, 2.85, 0, 1),
-    vec4(0, 2.45, 0, 1),
-    vec4(0.75, 2.85, 0, 1)
+    vec4(0, 0.4, 0, 1), // 13 diamond
+    vec4(-0.5, 0.0, 0, 1),
+    vec4(0, -0.4, 0, 1),
+    vec4(0.5, 0.0, 0, 1)
 ];
 
 var colors = [
@@ -144,21 +144,21 @@ function drawWindows(){
 }
 
 function drawDoor(){
-    // let doorMatrix = mult(modelViewMatrix, translate(0, 0, 0)); // left top window
-    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(doorMatrix));
+    let doorMatrix = mult(modelViewMatrix, translate(0, ty, 0));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(doorMatrix));
     gl.drawArrays(gl.TRIANGLE_FAN, 9, 4);
 
-    // let reset = mult(modelViewMatrix, translate(0, 0, 0));
-    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
+    let reset = mult(modelViewMatrix, translate(0, 0, 0));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
 }
 
 function drawDiamond(){
-    // let doorMatrix = mult(modelViewMatrix, translate(0, 0, 0)); // left top window
-    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(doorMatrix));
+    let diamondMatrix = mult(modelViewMatrix, mult(translate(0, 3, 0), rotateZ(theta)));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(diamondMatrix));
     gl.drawArrays(gl.TRIANGLE_FAN, 13, 4);
 
-    // let reset = mult(modelViewMatrix, translate(0, 0, 0));
-    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
+    let reset = mult(modelViewMatrix, translate(0, 0, 0));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
 }
 
 function render()
@@ -167,6 +167,21 @@ function render()
     modelViewMatrix = lookAt(eye, at, up);
     gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(modelViewMatrix) );
     drawWindows();
+    if (down) {
+        ty-=0.01;
+        if (ty <= -1.45) {
+            down=false;
+        }
+    }
+    else {
+        ty+=0.01;
+        if (ty >= 0) {
+            down=true;
+        }
+    }
+    
+    theta += 0.25;
+
     drawDoor();
     drawDiamond();
     drawHouse();
