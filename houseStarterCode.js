@@ -3,14 +3,50 @@
 var canvas;
 var gl;
 
-
-
 var points = [
+    vec4(-2.5, 2.5, 0, 1), // 0 main house
+    vec4(-2.5, 0, 0, 1),
+    vec4(2.5, 0, 0, 1),
+    vec4(2.5, 2.5, 0, 1),
+    vec4(0, 3.75, 0, 1),
 
+    vec4(-0.5, 0, 0, 1), // 5 window
+    vec4(0.5, 0, 0, 1),
+    vec4(0.5, 0.5, 0, 1),
+    vec4(-0.5, 0.5, 0, 1),
+
+    vec4(-0.75, 0, 0, 1), // 9 door
+    vec4(0.75, 0, 0, 1),
+    vec4(0.75, 1.1, 0, 1),
+    vec4(-0.75, 1.1, 0, 1),
+
+    vec4(0, 3.25, 0, 1), // 13 diamond
+    vec4(-0.75, 2.85, 0, 1),
+    vec4(0, 2.45, 0, 1),
+    vec4(0.75, 2.85, 0, 1)
 ];
 
 var colors = [
+    vec4(0.43, 0.0, 0.5, 1.0), // 0 main house purple
+    vec4(0.43, 0.0, 0.5, 1.0),
+    vec4(0.43, 0.0, 0.5, 1.0),
+    vec4(0.43, 0.0, 0.5, 1.0),
+    vec4(0.43, 0.0, 0.5, 1.0),
 
+    vec4(0.5, 0.75, 1.0, 1.0), // 5 window
+    vec4(0.5, 0.75, 1.0, 1.0),
+    vec4(0.5, 0.75, 1.0, 1.0),
+    vec4(0.5, 0.75, 1.0, 1.0),
+
+    vec4(1.0, 1.0, 0.75, 1.0), // 9 door
+    vec4(1.0, 1.0, 0.75, 1.0),
+    vec4(1.0, 1.0, 0.75, 1.0),
+    vec4(1.0, 1.0, 0.75, 1.0),
+
+    vec4(1.0, 0.65, 0.85, 1.0), // 13 diamond
+    vec4(1.0, 0.65, 0.85, 1.0),
+    vec4(1.0, 0.65, 0.85, 1.0),
+    vec4(1.0, 0.65, 0.85, 1.0)
 ];
 
 var numVertices  = points.length;
@@ -83,21 +119,46 @@ window.onload = function init()
 }
 
 function drawHouse(){
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    gl.drawArrays(gl.TRIANGLES, 4, 3);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, 5);
 }
 
 function drawWindows(){
-    gl.drawArrays(gl.TRIANGLE_FAN, 7, 4);
-    gl.drawArrays(gl.TRIANGLE_FAN, 11, 4);
+    let windowMatrix = mult(modelViewMatrix, translate(-1.5, 1.65, 0)); // left top window
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(windowMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, 5, 4);
+
+    windowMatrix = mult(modelViewMatrix, translate(1.5, 1.65, 0)); // right top window
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(windowMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, 5, 4);
+    
+    windowMatrix = mult(modelViewMatrix, mult(scalem(1, 1.5, 1), translate(-1.5, 0.35, 0))); // left bottom window
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(windowMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, 5, 4);
+
+    windowMatrix = mult(modelViewMatrix, mult(scalem(1, 1.5, 1), translate(1.5, 0.35, 0))); // right bottom window
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(windowMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, 5, 4);
+
+    let reset = mult(modelViewMatrix, translate(0, 0, 0));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
 }
 
-function drawEntrance(){
-    gl.drawArrays(gl.TRIANGLE_FAN, 15, 4);
+function drawDoor(){
+    // let doorMatrix = mult(modelViewMatrix, translate(0, 0, 0)); // left top window
+    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(doorMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, 9, 4);
+
+    // let reset = mult(modelViewMatrix, translate(0, 0, 0));
+    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
 }
 
 function drawDiamond(){
-    gl.drawArrays(gl.TRIANGLE_FAN, 19, 4);
+    // let doorMatrix = mult(modelViewMatrix, translate(0, 0, 0)); // left top window
+    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(doorMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, 13, 4);
+
+    // let reset = mult(modelViewMatrix, translate(0, 0, 0));
+    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(reset));
 }
 
 function render()
@@ -105,10 +166,10 @@ function render()
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     modelViewMatrix = lookAt(eye, at, up);
     gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(modelViewMatrix) );
-    drawHouse();
     drawWindows();
-    drawEntrance();
+    drawDoor();
     drawDiamond();
+    drawHouse();
 
     window.requestAnimationFrame(render);
 }
